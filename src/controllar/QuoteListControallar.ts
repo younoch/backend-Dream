@@ -1,21 +1,33 @@
 import { Request, Response } from "express";
 import QuoteListModel from "../models/QuoteListModel";
 
-const TodoListControallar : any = {}; 
+import type { IQuote  } from "../models";
 
-TodoListControallar.CreateTodo = (req: Request, res: Response)=>{
+const QuoteListControallar : any = {};
 
+QuoteListControallar.addQuote = (req: Request, res: Response)=>{
     let reqBody = req.body;
+    // replace(/[^a-z0-9]+/gi, "-").toLowerCase()
+    const PostBody : IQuote = {
+        quote: reqBody.quote,
+        speaker: reqBody.speaker,
+        lang: reqBody.lang,
+        category_id: reqBody.category_id,
+        slug: reqBody.quote.replace(/[^a-z0-9]+/gi, "-").toLowerCase(),
+        created_at: new Date(Date.now()),
+        updated_at: new Date(Date.now()),
+        tags: reqBody.tags,
+        comments: reqBody.comments
+    };
+    // let quote = reqBody.quote;
+    // let TodoDescription = reqBody['TodoDescription'];
+    // let UserName = req.headers['username'];
+    // let TodoStatus = 'New';
+    // let TodoCreateDate = Date.now();
+    // let TodoUpdateDate = Date.now();
 
-    let TodoSubject = reqBody['TodoSubject'];
-    let TodoDescription = reqBody['TodoDescription'];
-    let UserName = req.headers['username'];
-    let TodoStatus = 'New';
-    let TodoCreateDate = Date.now();
-    let TodoUpdateDate = Date.now();
 
-
-    let PostBody = {UserName,TodoSubject,TodoDescription,TodoStatus,TodoCreateDate, TodoUpdateDate}
+    
     QuoteListModel.create(PostBody, (err: any, data: any) => {
         if (err) {
             res.status(400).json({status: "fail", data: err})
@@ -26,7 +38,7 @@ TodoListControallar.CreateTodo = (req: Request, res: Response)=>{
 
 }
 
-TodoListControallar.SelectTodo = (req: Request, res: Response)=>{
+QuoteListControallar.SelectTodo = (req: Request, res: Response)=>{
 
     let UserName = req.headers['username'];
 
@@ -39,7 +51,7 @@ TodoListControallar.SelectTodo = (req: Request, res: Response)=>{
     })
 }
 
-TodoListControallar.UpdateTodo = (req: Request, res: Response)=>{
+QuoteListControallar.UpdateTodo = (req: Request, res: Response)=>{
     let TodoSubject = req.body['TodoSubject'];
     let TodoDescription = req.body['TodoDescription'];
     let _id = req.body['_id'];
@@ -55,7 +67,7 @@ TodoListControallar.UpdateTodo = (req: Request, res: Response)=>{
         }
     })
 }
-TodoListControallar.UpdateStatusTodo = (req: Request, res: Response)=>{
+QuoteListControallar.UpdateStatusTodo = (req: Request, res: Response)=>{
     let TodoStatus = req.body['TodoStatus'];
     let _id = req.body['_id'];
     let TodoUpdateDate = Date.now();
@@ -70,7 +82,7 @@ TodoListControallar.UpdateStatusTodo = (req: Request, res: Response)=>{
         }
     })
 }
-TodoListControallar.RemoveTodo = (req: Request, res: Response)=>{
+QuoteListControallar.RemoveTodo = (req: Request, res: Response)=>{
     let _id = req.body['_id'];
 
     QuoteListModel.deleteOne({ _id: _id }, (err: any, result: any) => {
@@ -83,7 +95,7 @@ TodoListControallar.RemoveTodo = (req: Request, res: Response)=>{
 }
 
 
-TodoListControallar.SelectTodoByStatus = (req :Request, res :Response)=>{
+QuoteListControallar.SelectTodoByStatus = (req :Request, res :Response)=>{
 
     // let UserName = req.headers['username'];
     let TodoStatus = req.body['TodoStatus'];
@@ -96,7 +108,7 @@ TodoListControallar.SelectTodoByStatus = (req :Request, res :Response)=>{
         }
     })
 }
-TodoListControallar.SelectTodoByDate = (req :Request, res :Response)=>{
+QuoteListControallar.SelectTodoByDate = (req :Request, res :Response)=>{
 
     let FormDate = req.body['FormDate'];
     let ToDate = req.body['ToDate'];
@@ -110,4 +122,4 @@ TodoListControallar.SelectTodoByDate = (req :Request, res :Response)=>{
     })
 }
 
-export default TodoListControallar
+export default QuoteListControallar

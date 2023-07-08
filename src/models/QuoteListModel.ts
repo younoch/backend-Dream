@@ -1,21 +1,6 @@
 import mongoose, { Document, Model, Schema } from 'mongoose';
 
-interface IComment {
-    user_id: string
-    user_name: string
-    comment: string
-}
-
-interface IQuote extends Document {
-    quote: string
-    lang: string
-    slug: string
-    category_id: string
-    tags: string[]
-    created_at: Date
-    updated_at: Date
-    comments: IComment[]
-}
+import type { IQuote  } from "../models";
 
 // Define the IComment schema
 const ICommentSchema = new Schema({

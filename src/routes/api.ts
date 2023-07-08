@@ -25,8 +25,8 @@ router.post("/UpdateProfile", AuthVerifiyMiddlewere, (req: Request, res: Respons
   ProfileControllar.UpdateProfile(req, res);
 });
 
-router.post("/CreateTodo", AuthVerifiyMiddlewere, (req: Request, res: Response) => {
-  QuoteListControallar.CreateTodo(req, res);
+router.post("/add-quote", (req: Request, res: Response) => {
+  QuoteListControallar.addQuote(req, res);
 });
 
 router.get("/SelectTodo", AuthVerifiyMiddlewere, (req: Request, res: Response) => {
