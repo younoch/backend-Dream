@@ -7,7 +7,7 @@ interface IComment {
 
  export interface IQuote {
     quote: string
-    speaker: string
+    author: string
     lang: string
     slug: string
     category_id: string

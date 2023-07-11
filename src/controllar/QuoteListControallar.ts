@@ -7,10 +7,9 @@ const QuoteListControallar : any = {};
 
 QuoteListControallar.addQuote = (req: Request, res: Response)=>{
     let reqBody = req.body;
-    // replace(/[^a-z0-9]+/gi, "-").toLowerCase()
     const PostBody : IQuote = {
         quote: reqBody.quote,
-        speaker: reqBody.speaker,
+        author: reqBody.author,
         lang: reqBody.lang,
         category_id: reqBody.category_id,
         slug: reqBody.quote.replace(/[^a-z0-9]+/gi, "-").toLowerCase(),
@@ -19,15 +18,7 @@ QuoteListControallar.addQuote = (req: Request, res: Response)=>{
         tags: reqBody.tags,
         comments: reqBody.comments
     };
-    // let quote = reqBody.quote;
-    // let TodoDescription = reqBody['TodoDescription'];
-    // let UserName = req.headers['username'];
-    // let TodoStatus = 'New';
-    // let TodoCreateDate = Date.now();
-    // let TodoUpdateDate = Date.now();
 
-
-    
     QuoteListModel.create(PostBody, (err: any, data: any) => {
         if (err) {
             res.status(400).json({status: "fail", data: err})
@@ -38,88 +29,98 @@ QuoteListControallar.addQuote = (req: Request, res: Response)=>{
 
 }
 
-QuoteListControallar.SelectTodo = (req: Request, res: Response)=>{
+QuoteListControallar.getQuotes = (req: Request, res: Response)=>{
+    let page = parseInt(req.query.page as string) || 1;
+    let limit = parseInt(req.query.limit as string) || 10;
+    let offset = (page - 1) * limit;
+    let total = 0;
 
-    let UserName = req.headers['username'];
+    QuoteListModel.find({})
+        .skip(offset)
+        .limit(limit)
+        .sort({created_at: -1})
+        .exec((err: any, data: IQuote[]) => {
+            if (err) {
+                res.status(400).json({status: "fail", data: err})
+            } else {
+                QuoteListModel.countDocuments({}, (err: any, count: number) => {
+                    if (err) {
+                        res.status(400).json({status: "fail", data: err})
+                    } else {
+                        total = count;
+                        let pages = Math.ceil(total / limit);
+                        res.status(200).json({
+                            status: "success", 
+                            data: data,
+                            pagination: {
+                                page: page,
+                                limit: limit,
+                                pages: pages,
+                                total: total
+                            },
+                            meta: {
+                                message: `Showing ${data.length} of ${total} quotes`
+                            }
+                        })
+                    }
+                })
+            }
+        })
+}
 
-    QuoteListModel.find({ UserName: UserName}, (err: any, data: any) => {
+QuoteListControallar.updateQuote = (req: Request, res: Response)=>{
+    let _id = req.query._id as string;
+    let updateBody = req.body;
+    updateBody.updated_at = new Date(Date.now());
+    updateBody.slug = updateBody.quote.replace(/[^a-z0-9]+/gi, "-").toLowerCase();
+
+    QuoteListModel.findByIdAndUpdate(_id, updateBody, {new: true}, (err: any, data: IQuote | null) => {
         if (err) {
             res.status(400).json({status: "fail", data: err})
         } else {
-            res.status(200).json({status: "Success", data: data})
+            res.status(200).json({status: "success", data: data})
         }
     })
 }
 
-QuoteListControallar.UpdateTodo = (req: Request, res: Response)=>{
-    let TodoSubject = req.body['TodoSubject'];
-    let TodoDescription = req.body['TodoDescription'];
-    let _id = req.body['_id'];
-    let TodoUpdateDate = Date.now();
-
-    let PostBody = {TodoSubject,TodoDescription, TodoUpdateDate}
-
-    QuoteListModel.updateOne({ _id: _id }, { $set: PostBody }, {upsert: true}, (err: any, data: any) => {
+QuoteListControallar.getTags = (req: Request, res: Response)=>{
+    QuoteListModel.aggregate([
+        {$unwind: "$tags"}, 
+        {$group: {_id: "$tags", count: {$sum: 1}}}, 
+        {$sort: {count: -1}} 
+    ])
+    .exec((err: any, data: any) => {
         if (err) {
             res.status(400).json({status: "fail", data: err})
         } else {
-            res.status(200).json({status: "Success", data: data})
+            res.status(200).json({status: "success", data: data})
         }
     })
 }
-QuoteListControallar.UpdateStatusTodo = (req: Request, res: Response)=>{
-    let TodoStatus = req.body['TodoStatus'];
-    let _id = req.body['_id'];
-    let TodoUpdateDate = Date.now();
 
-    let PostBody = {TodoStatus, TodoUpdateDate}
-
-    QuoteListModel.updateOne({ _id: _id }, { $set: PostBody }, {upsert: true}, (err: any, data: any) => {
+QuoteListControallar.searchQuotes = (req: Request, res: Response)=>{
+    let query = req.query.q as string;
+    if (!query) {
+        res.status(400).json({status: "fail", data: "Missing query parameter"});
+        return;
+    }
+    let regex = new RegExp(query, "i");
+    QuoteListModel.aggregate([
+        {$match: {$or: [{quote: regex}, {author: regex}]}}, 
+        {$addFields: {matches: {$sum: [ 
+            {$cond: [{$regexMatch: {input: "$quote", regex: regex}}, 1, 0]}, 
+            {$cond: [{$regexMatch: {input: "$author", regex: regex}}, 1, 0]} 
+        ]}}},
+        {$sort: {matches: -1}} 
+    ])
+    .exec((err: any, data: any) => {
         if (err) {
             res.status(400).json({status: "fail", data: err})
         } else {
-            res.status(200).json({status: "Success", data: data})
-        }
-    })
-}
-QuoteListControallar.RemoveTodo = (req: Request, res: Response)=>{
-    let _id = req.body['_id'];
-
-    QuoteListModel.deleteOne({ _id: _id }, (err: any, result: any) => {
-        if (err) {
-            res.status(400).json({status: "fail", data: err})
-        } else {
-            res.status(200).json({status: "Success", data: result})
+            res.status(200).json({status: "success", data: data})
         }
     })
 }
 
-
-QuoteListControallar.SelectTodoByStatus = (req :Request, res :Response)=>{
-
-    // let UserName = req.headers['username'];
-    let TodoStatus = req.body['TodoStatus'];
-
-    QuoteListModel.find({ TodoStatus}, (err:any, data:any) => {
-        if (err) {
-            res.status(400).json({status: "fail", data: err})
-        } else {
-            res.status(200).json({status: "Success", data:data})
-        }
-    })
-}
-QuoteListControallar.SelectTodoByDate = (req :Request, res :Response)=>{
-
-    let FormDate = req.body['FormDate'];
-    let ToDate = req.body['ToDate'];
-
-    QuoteListModel.find({ TodoCreateDate : {$gte : new Date(FormDate), $lte : new Date(ToDate)}}, (err:any, data:any) => {
-        if (err) {
-            res.status(400).json({status : "fail", data : err})
-        } else {
-            res.status(200).json({status : "Success", data :data})
-        }
-    })
-}
 
 export default QuoteListControallar

@@ -12,6 +12,7 @@ const ICommentSchema = new Schema({
 // Define the IQuote schema
 const IQuoteSchema = new Schema({
     quote: String,
+    author: String,
     lang: String,
     slug: String,
     category_id: String,

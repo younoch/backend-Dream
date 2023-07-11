@@ -29,24 +29,20 @@ router.post("/add-quote", (req: Request, res: Response) => {
   QuoteListControallar.addQuote(req, res);
 });
 
-router.get("/SelectTodo", AuthVerifiyMiddlewere, (req: Request, res: Response) => {
-  QuoteListControallar.SelectTodo(req, res);
+router.get("/get-quotes", (req: Request, res: Response) => {
+  QuoteListControallar.getQuotes(req, res);
 });
 
-router.post("/UpdateTodo", AuthVerifiyMiddlewere, (req: Request, res: Response) => {
-  QuoteListControallar.UpdateTodo(req, res);
+router.put("/update-quote", (req: Request, res: Response) => {
+  QuoteListControallar.updateQuote(req, res);
 });
 
-router.post("/UpdateStatusTodo", AuthVerifiyMiddlewere, (req: Request, res: Response) => {
-  QuoteListControallar.UpdateStatusTodo(req, res);
+router.get("/get-tags", (req: Request, res: Response) => {
+  QuoteListControallar.getTags(req, res);
 });
 
-router.post("/RemoveTodo", AuthVerifiyMiddlewere, (req: Request, res: Response) => {
-  QuoteListControallar.RemoveTodo(req, res);
-});
-
-router.post("/SelectTodoByDate", AuthVerifiyMiddlewere, (req: Request, res: Response) => {
-  QuoteListControallar.SelectTodoByDate(req, res);
+router.get("/search-quotes", (req: Request, res: Response) => {
+  QuoteListControallar.searchQuotes(req, res);
 });
 
 module.exports = router;
