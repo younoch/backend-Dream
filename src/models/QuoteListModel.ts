@@ -1,4 +1,4 @@
-import mongoose, { Document, Model, Schema } from 'mongoose';
+import mongoose, { Model, Schema } from 'mongoose';
 
 import type { IQuote  } from "../models";
 
