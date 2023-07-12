@@ -15,6 +15,7 @@ TagController.updateTags = async (tags: string[]) => {
 };
 
 TagController.getTags = (req: Request, res: Response) => {
+  
   TagModel.find({}, (err : any, data : any) => {
     if (err) {
       res.status(400).json({ status: "fail", data: err });

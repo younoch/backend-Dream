@@ -39,7 +39,7 @@ router.post("/add-quote", (req: Request, res: Response) => {
 });
 
 router.get("/get-quotes", (req: Request, res: Response) => {
-  TagController.getTags(req, res);
+  QuoteListController.getQuotes(req, res);
 });
 
 router.put("/update-quote", (req: Request, res: Response) => {
@@ -47,7 +47,7 @@ router.put("/update-quote", (req: Request, res: Response) => {
 });
 
 router.get("/get-tags", (req: Request, res: Response) => {
-  QuoteListController.getTags(req, res);
+  TagController.getTags(req, res);
 });
 
 router.get("/search-quotes", (req: Request, res: Response) => {
