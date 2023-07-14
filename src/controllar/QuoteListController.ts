@@ -39,6 +39,7 @@ QuoteListControaller.getQuotes = (req: Request, res: Response) => {
     .skip(offset)
     .limit(limit)
     .sort({ created_at: -1 })
+    .populate("comments.profile")
     .exec((err: any, data: IQuote[]) => {
       if (err) {
         res.status(400).json({ status: "fail", data: err });

@@ -2,14 +2,11 @@ import mongoose, { Model, Schema } from 'mongoose';
 
 import type { IQuote  } from "../models";
 
-// Define the IComment schema
 const ICommentSchema = new Schema({
-    user_id: String,
-    user_name: String,
+    profile: { type: Schema.Types.ObjectId, ref: 'Profile' },
     comment: String
 });
 
-// Define the IQuote schema
 const IQuoteSchema = new Schema({
     quote: String,
     author: String,
