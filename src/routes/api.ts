@@ -2,6 +2,7 @@ import express, { Router, Request, Response } from "express";
 import ProfileController from "../controllar/ProfileController";
 import QuoteListController from "../controllar/QuoteListController";
 import TagController from "../controllar/TagController";
+import ContactUsController from "../controllar/ContactUsController";
 import AuthVerifiyMiddlewere from "../middleware/AuthVerifiyMiddlewere";
 
 const router: Router = express.Router();
@@ -34,6 +35,8 @@ router.post(
   }
 );
 
+//Quote controllar Implementation
+
 router.post("/add-quote", (req: Request, res: Response) => {
   QuoteListController.addQuote(req, res);
 });
@@ -42,16 +45,27 @@ router.get("/get-quotes", (req: Request, res: Response) => {
   QuoteListController.getQuotes(req, res);
 });
 
+router.get("/get-single-quote/:id", (req: Request, res: Response) => {
+  QuoteListController.getSingleQuote(req, res);
+});
+
 router.put("/update-quote", (req: Request, res: Response) => {
   QuoteListController.updateQuote(req, res);
 });
+
+router.get("/search-quotes", (req: Request, res: Response) => {
+  QuoteListController.searchQuotes(req, res);
+});
+
+// Tegs Controller Implementation
 
 router.get("/get-tags", (req: Request, res: Response) => {
   TagController.getTags(req, res);
 });
 
-router.get("/search-quotes", (req: Request, res: Response) => {
-  QuoteListController.searchQuotes(req, res);
+//
+router.post("/create-contact-message", (req: Request, res: Response) => {
+  ContactUsController.createContactMessage(req, res);
 });
 
 module.exports = router;

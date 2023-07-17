@@ -6,7 +6,7 @@ import type { IQuote } from "../models";
 const QuoteListControaller: any = {};
 
 QuoteListControaller.addQuote = (req: Request, res: Response) => {
-  let reqBody = req.body;
+  let reqBody : IQuote = req.body;
   const PostBody: IQuote = {
     quote: reqBody.quote,
     author: reqBody.author,
@@ -39,7 +39,6 @@ QuoteListControaller.getQuotes = (req: Request, res: Response) => {
     .skip(offset)
     .limit(limit)
     .sort({ created_at: -1 })
-    .populate("comments.profile")
     .exec((err: any, data: IQuote[]) => {
       if (err) {
         res.status(400).json({ status: "fail", data: err });
@@ -65,6 +64,23 @@ QuoteListControaller.getQuotes = (req: Request, res: Response) => {
             });
           }
         });
+      }
+    });
+};
+
+QuoteListControaller.getSingleQuote = (req: Request, res: Response) => {
+  let id = req.params.id;
+  QuoteListModel.findById(id) 
+    .populate("comments.profile") 
+    .exec((err: any, data: IQuote | null) => {
+      if (err) {
+        res.status(400).json({ status: "fail", data: err }); 
+      } else {
+        if (data) {
+          res.status(200).json({ status: "success", data: data }); 
+        } else {
+          res.status(404).json({ status: "fail", data: "Quote not found" });
+        }
       }
     });
 };

@@ -20,3 +20,9 @@ interface ITag {
     name: string,
     counts: number,
 }
+interface IContactUs {
+  name: String,
+  email: String,
+  subject: String,
+  message: String,
+}
