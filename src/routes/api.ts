@@ -37,6 +37,10 @@ router.post(
 
 //Quote controllar Implementation
 
+router.get("/test", (req: Request, res: Response) => {
+  QuoteListController.test(req, res);
+});
+
 router.post("/add-quote", (req: Request, res: Response) => {
   QuoteListController.addQuote(req, res);
 });
@@ -51,6 +55,10 @@ router.get("/get-single-quote/:id", (req: Request, res: Response) => {
 
 router.put("/update-quote", (req: Request, res: Response) => {
   QuoteListController.updateQuote(req, res);
+});
+
+router.delete("/delete-quote", (req: Request, res: Response) => {
+  QuoteListController.deleteQuote(req, res);
 });
 
 router.get("/search-quotes", (req: Request, res: Response) => {

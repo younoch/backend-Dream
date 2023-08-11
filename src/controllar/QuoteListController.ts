@@ -1,9 +1,14 @@
 import { Request, Response } from "express";
+import mongoose, { Model, Schema } from 'mongoose';
 import QuoteListModel from "../models/QuoteListModel";
 import TagController from "./TagController";
 import type { IQuote } from "../models";
 
 const QuoteListControaller: any = {};
+
+QuoteListControaller.test = (req: Request, res: Response) => {
+      res.status(200).json({ status: "success", data: {massage: "Api success", mongoose: QuoteListModel} }); 
+};
 
 QuoteListControaller.addQuote = (req: Request, res: Response) => {
   let reqBody : IQuote = req.body;
@@ -89,7 +94,9 @@ QuoteListControaller.updateQuote = (req: Request, res: Response) => {
   let _id = req.query._id as string;
   let updateBody = req.body;
   updateBody.updated_at = new Date(Date.now());
-  updateBody.slug = updateBody.quote.replace(/[^a-z0-9]+/gi, "-").toLowerCase();
+  if(updateBody.quote) {
+    updateBody.slug = updateBody.quote.replace(/[^a-z0-9]+/gi, "-").toLowerCase();
+  }
 
   QuoteListModel.findByIdAndUpdate(
     _id,
@@ -115,6 +122,21 @@ QuoteListControaller.getTags = (req: Request, res: Response) => {
       res.status(400).json({ status: "fail", data: err });
     } else {
       res.status(200).json({ status: "success", data: data });
+    }
+  });
+};
+
+QuoteListControaller.deleteQuote = (req: Request, res: Response) => {
+  let _id = req.query._id as string; 
+  QuoteListModel.findByIdAndDelete(_id, (err: any, data: IQuote | null) => { 
+    if (err) {
+      res.status(400).json({ status: "fail", data: err }); 
+    } else {
+      if (data) {
+        res.status(200).json({ status: "successfully deleted" }); 
+      } else {
+        res.status(404).json({ status: "fail", data: "Quote not found" });
+      }
     }
   });
 };
