@@ -1,2 +1,3 @@
-# practice-node
-A trail project for learning 
+## The speakers
+
+[Preview](https://the-speakers.com/)
