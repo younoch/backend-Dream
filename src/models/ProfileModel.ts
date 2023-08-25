@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 interface DataSchema {
   FirstName: string;
@@ -6,21 +6,23 @@ interface DataSchema {
   EmailAddress: string;
   MobileNumber: string;
   City: string;
-  UserName: string;
-  Password: string;
+  username: string;
+  password: string;
 }
 
-const DataSchema = new mongoose.Schema<DataSchema>({
+const DataSchema = new mongoose.Schema<DataSchema>(
+  {
+    FirstName: { type: String },
+    LastName: { type: String },
+    EmailAddress: { type: String },
+    MobileNumber: { type: String },
+    City: { type: String },
+    username: { type: String, unique: true },
+    password: { type: String },
+  },
+  { versionKey: false }
+);
 
-    FirstName: {type:String},
-    LastName: {type:String},
-    EmailAddress: {type:String},
-    MobileNumber: {type:String},
-    City: {type:String},
-    UserName: {type:String, unique: true},
-    Password: {type:String},
-}, { versionKey: false })
-
-const ProfileModel = mongoose.model("Profile", DataSchema)
+const ProfileModel = mongoose.model("Profile", DataSchema);
 
 export default ProfileModel;

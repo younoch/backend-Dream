@@ -7,10 +7,6 @@ import AuthVerifiyMiddlewere from "../middleware/AuthVerifiyMiddlewere";
 
 const router: Router = express.Router();
 
-router.get("/testApi", (req: Request, res: Response) => {
-  ProfileController.testApi(req, res);
-});
-
 router.post("/CreateProfile", (req: Request, res: Response) => {
   ProfileController.CreateProfile(req, res);
 });
@@ -63,6 +59,10 @@ router.delete("/delete-quote", (req: Request, res: Response) => {
 
 router.get("/search-quotes", (req: Request, res: Response) => {
   QuoteListController.searchQuotes(req, res);
+});
+
+router.get("/get-quotes-by-category/:category_id", (req: Request, res: Response) => {
+  QuoteListController.getQuotesByCategory(req, res);
 });
 
 // Tegs Controller Implementation

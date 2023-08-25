@@ -178,4 +178,45 @@ QuoteListControaller.searchQuotes = (req: Request, res: Response) => {
   });
 };
 
+QuoteListControaller.getQuotesByCategory = (req: Request, res: Response) => {
+  let page = parseInt(req.query.page as string) || 1;
+  let limit = parseInt(req.query.limit as string) || 10;
+  let offset = (page - 1) * limit;
+  let total = 0;
+  let category_id = req.params.category_id; // get the category_id from the request
+
+  QuoteListModel.find({category_id: category_id}) // find quotes that match the category_id
+    .skip(offset)
+    .limit(limit)
+    .sort({ created_at: -1 })
+    .exec((err: any, data: IQuote[]) => {
+      if (err) {
+        res.status(400).json({ status: "fail", data: err });
+      } else {
+        QuoteListModel.countDocuments({category_id: category_id}, (err: any, count: number) => {
+          if (err) {
+            res.status(400).json({ status: "fail", data: err });
+          } else {
+            total = count;
+            let pages = Math.ceil(total / limit);
+            res.status(200).json({
+              status: "success",
+              data: data,
+              pagination: {
+                page: page,
+                limit: limit,
+                pages: pages,
+                total: total,
+              },
+              meta: {
+                message: `Showing ${data.length} of ${total} quotes in category ${category_id}`,
+              },
+            });
+          }
+        });
+      }
+    });
+};
+
+
 export default QuoteListControaller;
