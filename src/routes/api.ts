@@ -33,10 +33,6 @@ router.post(
 
 //Quote controllar Implementation
 
-router.get("/test", (req: Request, res: Response) => {
-  QuoteListController.test(req, res);
-});
-
 router.post("/add-quote", (req: Request, res: Response) => {
   QuoteListController.addQuote(req, res);
 });
@@ -63,6 +59,10 @@ router.get("/search-quotes", (req: Request, res: Response) => {
 
 router.get("/get-quotes-by-category/:category_id", (req: Request, res: Response) => {
   QuoteListController.getQuotesByCategory(req, res);
+});
+
+router.get("/get-quotes-by-tag", (req: Request, res: Response) => {
+  QuoteListController.getQuotesByTag(req, res);
 });
 
 // Tegs Controller Implementation

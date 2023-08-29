@@ -32,8 +32,8 @@
 
     // Mongo DB Database Connection
 
-    // let URL = 'mongodb://localhost:27017/Todo';
-    let URL = 'mongodb+srv://younoch295:Teletalk9@cluster1.x5joavo.mongodb.net/Quote?retryWrites=true&w=majority';
+    let URL = 'mongodb://localhost:27017/quotes'
+    // let URL = 'mongodb+srv://younoch295:Teletalk9@cluster1.x5joavo.mongodb.net/Quote?retryWrites=true&w=majority'
     let OPTION = { user: '', pass: '', autoIndex: true }
     mongoose.set("strictQuery", false);
     mongoose.connect(URL, OPTION, (err : any)=> {

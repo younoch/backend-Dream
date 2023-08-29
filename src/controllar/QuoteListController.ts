@@ -1,14 +1,9 @@
 import { Request, Response } from "express";
-import mongoose, { Model, Schema } from 'mongoose';
 import QuoteListModel from "../models/QuoteListModel";
 import TagController from "./TagController";
 import type { IQuote } from "../models";
 
 const QuoteListControaller: any = {};
-
-QuoteListControaller.test = (req: Request, res: Response) => {
-      res.status(200).json({ status: "success", data: {massage: "Api success", mongoose: QuoteListModel} }); 
-};
 
 QuoteListControaller.addQuote = (req: Request, res: Response) => {
   let reqBody : IQuote = req.body;
@@ -217,6 +212,47 @@ QuoteListControaller.getQuotesByCategory = (req: Request, res: Response) => {
       }
     });
 };
+
+QuoteListControaller.getQuotesByTag = (req: Request, res: Response) => {
+  let tag = req.query.tag as string;
+  let page = parseInt(req.query.page as string) || 1;
+  let limit = parseInt(req.query.limit as string) || 10;
+  let offset = (page - 1) * limit;
+  let total = 0;
+
+  QuoteListModel.find({ tags: tag })
+    .skip(offset)
+    .limit(limit)
+    .sort({ created_at: -1 })
+    .exec((err: any, data: IQuote[]) => {
+      if (err) {
+        res.status(400).json({ status: "fail", data: err });
+      } else {
+        QuoteListModel.countDocuments({ tags: tag }, (err: any, count: number) => {
+          if (err) {
+            res.status(400).json({ status: "fail", data: err });
+          } else {
+            total = count;
+            let pages = Math.ceil(total / limit);
+            res.status(200).json({
+              status: "success",
+              data: data,
+              pagination: {
+                page: page,
+                limit: limit,
+                pages: pages,
+                total: total,
+              },
+              meta: {
+                message: `Showing ${data.length} of ${total} quotes with tag "${tag}"`,
+              },
+            });
+          }
+        });
+      }
+    });
+};
+
 
 
 export default QuoteListControaller;
