@@ -6,13 +6,26 @@ import type { IQuote } from "../models";
 const QuoteListControaller: any = {};
 
 QuoteListControaller.addQuote = (req: Request, res: Response) => {
-  let reqBody : IQuote = req.body;
+  let reqBody: IQuote = req.body;
+  let slug = "";
+  if (reqBody.slug) {
+    slug = reqBody.slug;
+  } else {
+    let words = reqBody.quote.split(" ");
+    if (words.length > 7) {
+      words = words.slice(0, 7);
+    }
+    slug = words.join("-").toLowerCase();
+    slug = slug.replace(/[^a-z0-9]+/gi, "-");
+  }
+
   const PostBody: IQuote = {
     quote: reqBody.quote,
     author: reqBody.author,
     lang: reqBody.lang,
     category_id: reqBody.category_id,
-    slug: reqBody.quote.replace(/[^a-z0-9]+/gi, "-").toLowerCase(),
+    // slug: reqBody.quote.replace(/[^a-z0-9]+/gi, "-").toLowerCase(),
+    slug: slug,
     created_at: new Date(Date.now()),
     updated_at: new Date(Date.now()),
     tags: reqBody.tags,
@@ -68,16 +81,33 @@ QuoteListControaller.getQuotes = (req: Request, res: Response) => {
     });
 };
 
-QuoteListControaller.getSingleQuote = (req: Request, res: Response) => {
+QuoteListControaller.getQuoteByID = (req: Request, res: Response) => {
   let id = req.params.id;
-  QuoteListModel.findById(id) 
-    .populate("comments.profile") 
+  QuoteListModel.findById(id)
+    .populate("comments.profile")
     .exec((err: any, data: IQuote | null) => {
       if (err) {
-        res.status(400).json({ status: "fail", data: err }); 
+        res.status(400).json({ status: "fail", data: err });
       } else {
         if (data) {
-          res.status(200).json({ status: "success", data: data }); 
+          res.status(200).json({ status: "success", data: data });
+        } else {
+          res.status(404).json({ status: "fail", data: "Quote not found" });
+        }
+      }
+    });
+};
+
+QuoteListControaller.getQuoteBySlug = (req: Request, res: Response) => {
+  let slug = req.params.slug;
+  QuoteListModel.findOne({ slug: slug })
+    .populate("comments.profile")
+    .exec((err: any, data: IQuote | null) => {
+      if (err) {
+        res.status(400).json({ status: "fail", data: err });
+      } else {
+        if (data) {
+          res.status(200).json({ status: "success", data: data });
         } else {
           res.status(404).json({ status: "fail", data: "Quote not found" });
         }
@@ -89,8 +119,10 @@ QuoteListControaller.updateQuote = (req: Request, res: Response) => {
   let _id = req.query._id as string;
   let updateBody = req.body;
   updateBody.updated_at = new Date(Date.now());
-  if(updateBody.quote) {
-    updateBody.slug = updateBody.quote.replace(/[^a-z0-9]+/gi, "-").toLowerCase();
+  if (updateBody.quote) {
+    updateBody.slug = updateBody.quote
+      .replace(/[^a-z0-9]+/gi, "-")
+      .toLowerCase();
   }
 
   QuoteListModel.findByIdAndUpdate(
@@ -122,13 +154,13 @@ QuoteListControaller.getTags = (req: Request, res: Response) => {
 };
 
 QuoteListControaller.deleteQuote = (req: Request, res: Response) => {
-  let _id = req.query._id as string; 
-  QuoteListModel.findByIdAndDelete(_id, (err: any, data: IQuote | null) => { 
+  let _id = req.query._id as string;
+  QuoteListModel.findByIdAndDelete(_id, (err: any, data: IQuote | null) => {
     if (err) {
-      res.status(400).json({ status: "fail", data: err }); 
+      res.status(400).json({ status: "fail", data: err });
     } else {
       if (data) {
-        res.status(200).json({ status: "successfully deleted" }); 
+        res.status(200).json({ status: "successfully deleted" });
       } else {
         res.status(404).json({ status: "fail", data: "Quote not found" });
       }
@@ -180,7 +212,7 @@ QuoteListControaller.getQuotesByCategory = (req: Request, res: Response) => {
   let total = 0;
   let category_id = req.params.category_id; // get the category_id from the request
 
-  QuoteListModel.find({category_id: category_id}) // find quotes that match the category_id
+  QuoteListModel.find({ category_id: category_id }) // find quotes that match the category_id
     .skip(offset)
     .limit(limit)
     .sort({ created_at: -1 })
@@ -188,27 +220,30 @@ QuoteListControaller.getQuotesByCategory = (req: Request, res: Response) => {
       if (err) {
         res.status(400).json({ status: "fail", data: err });
       } else {
-        QuoteListModel.countDocuments({category_id: category_id}, (err: any, count: number) => {
-          if (err) {
-            res.status(400).json({ status: "fail", data: err });
-          } else {
-            total = count;
-            let pages = Math.ceil(total / limit);
-            res.status(200).json({
-              status: "success",
-              data: data,
-              pagination: {
-                page: page,
-                limit: limit,
-                pages: pages,
-                total: total,
-              },
-              meta: {
-                message: `Showing ${data.length} of ${total} quotes in category ${category_id}`,
-              },
-            });
+        QuoteListModel.countDocuments(
+          { category_id: category_id },
+          (err: any, count: number) => {
+            if (err) {
+              res.status(400).json({ status: "fail", data: err });
+            } else {
+              total = count;
+              let pages = Math.ceil(total / limit);
+              res.status(200).json({
+                status: "success",
+                data: data,
+                pagination: {
+                  page: page,
+                  limit: limit,
+                  pages: pages,
+                  total: total,
+                },
+                meta: {
+                  message: `Showing ${data.length} of ${total} quotes in category ${category_id}`,
+                },
+              });
+            }
           }
-        });
+        );
       }
     });
 };
@@ -228,31 +263,32 @@ QuoteListControaller.getQuotesByTag = (req: Request, res: Response) => {
       if (err) {
         res.status(400).json({ status: "fail", data: err });
       } else {
-        QuoteListModel.countDocuments({ tags: tag }, (err: any, count: number) => {
-          if (err) {
-            res.status(400).json({ status: "fail", data: err });
-          } else {
-            total = count;
-            let pages = Math.ceil(total / limit);
-            res.status(200).json({
-              status: "success",
-              data: data,
-              pagination: {
-                page: page,
-                limit: limit,
-                pages: pages,
-                total: total,
-              },
-              meta: {
-                message: `Showing ${data.length} of ${total} quotes with tag "${tag}"`,
-              },
-            });
+        QuoteListModel.countDocuments(
+          { tags: tag },
+          (err: any, count: number) => {
+            if (err) {
+              res.status(400).json({ status: "fail", data: err });
+            } else {
+              total = count;
+              let pages = Math.ceil(total / limit);
+              res.status(200).json({
+                status: "success",
+                data: data,
+                pagination: {
+                  page: page,
+                  limit: limit,
+                  pages: pages,
+                  total: total,
+                },
+                meta: {
+                  message: `Showing ${data.length} of ${total} quotes with tag "${tag}"`,
+                },
+              });
+            }
           }
-        });
+        );
       }
     });
 };
-
-
 
 export default QuoteListControaller;

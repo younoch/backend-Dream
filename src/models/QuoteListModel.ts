@@ -8,10 +8,10 @@ const ICommentSchema = new Schema({
 });
 
 const IQuoteSchema = new Schema({
-    quote: { type: String, unique: true },
+    quote: String,
     author: String,
     lang: String,
-    slug: String,
+    slug: { type: String, unique: true },
     category_id: String,
     tags: [String],
     created_at: Date,

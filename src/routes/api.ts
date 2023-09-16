@@ -42,7 +42,10 @@ router.get("/get-quotes", (req: Request, res: Response) => {
 });
 
 router.get("/get-single-quote/:id", (req: Request, res: Response) => {
-  QuoteListController.getSingleQuote(req, res);
+  QuoteListController.getQuoteByID(req, res);
+});
+router.get("/get-quote-by-slug/:slug", (req: Request, res: Response) => {
+  QuoteListController.getQuoteBySlug(req, res);
 });
 
 router.put("/update-quote", (req: Request, res: Response) => {
@@ -57,9 +60,12 @@ router.get("/search-quotes", (req: Request, res: Response) => {
   QuoteListController.searchQuotes(req, res);
 });
 
-router.get("/get-quotes-by-category/:category_id", (req: Request, res: Response) => {
-  QuoteListController.getQuotesByCategory(req, res);
-});
+router.get(
+  "/get-quotes-by-category/:category_id",
+  (req: Request, res: Response) => {
+    QuoteListController.getQuotesByCategory(req, res);
+  }
+);
 
 router.get("/get-quotes-by-tag", (req: Request, res: Response) => {
   QuoteListController.getQuotesByTag(req, res);
