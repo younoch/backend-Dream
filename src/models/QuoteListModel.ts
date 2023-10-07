@@ -13,6 +13,7 @@ const IQuoteSchema = new Schema({
     lang: String,
     slug: { type: String, unique: true },
     category_id: String,
+    image: String,
     tags: [String],
     created_at: Date,
     updated_at: Date,

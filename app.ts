@@ -43,6 +43,8 @@
 
     app.use('/api/v1', router);
 
+    app.use(express.static('public'));
+
     //Undefiend route Implement
 
     app.use('*', (req, res) => {

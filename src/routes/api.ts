@@ -1,11 +1,30 @@
 import express, { Router, Request, Response } from "express";
+import multer from "multer";
+import path from "path";
 import ProfileController from "../controllar/ProfileController";
 import QuoteListController from "../controllar/QuoteListController";
 import TagController from "../controllar/TagController";
 import ContactUsController from "../controllar/ContactUsController";
 import AuthVerifiyMiddlewere from "../middleware/AuthVerifiyMiddlewere";
 
+
 const router: Router = express.Router();
+  const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, './public/images')
+    },
+    filename: (req, file, cb) => {
+      cb(null, req.query._id + '.png' );
+    }
+  })
+  const upload = multer(
+  { 
+    storage: storage,
+    limits: {
+      fileSize: 1000000
+    }
+   },
+  ); 
 
 router.post("/CreateProfile", (req: Request, res: Response) => {
   ProfileController.CreateProfile(req, res);
@@ -35,6 +54,10 @@ router.post(
 
 router.post("/add-quote", (req: Request, res: Response) => {
   QuoteListController.addQuote(req, res);
+});
+
+router.post("/upload-image-by-id", upload.single('image'), (req: Request, res: Response) => {
+  QuoteListController.coverUpload(req, res);
 });
 
 router.get("/get-quotes", (req: Request, res: Response) => {

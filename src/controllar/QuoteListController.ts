@@ -1,4 +1,5 @@
-import { Request, Response } from "express";
+import { Request, Response , MulterRequest} from "express";
+import multer from 'multer'
 import QuoteListModel from "../models/QuoteListModel";
 import TagController from "./TagController";
 import type { IQuote } from "../models";
@@ -41,6 +42,29 @@ QuoteListControaller.addQuote = (req: Request, res: Response) => {
     }
   });
 };
+
+QuoteListControaller.coverUpload = (req: MulterRequest, res: Response, err: any) => {
+  let _id = req.query._id as string;
+  let updateBody = req.body;
+  updateBody.updated_at = new Date(Date.now());
+const imageUrl = `${req.protocol}://${req.get('host')}/images/${_id}.png`
+  updateBody.image = imageUrl
+  console.log(imageUrl);
+  QuoteListModel.findByIdAndUpdate(
+    _id,
+    updateBody,
+    { new: true },
+    (err: any, data: IQuote | null) => {
+      if (err) {
+        res.status(400).json({ status: "fail", data: err });
+      } else {
+        res.status(200).json({ status: "success", data: data });
+      }
+    }
+  );
+  }
+
+
 
 QuoteListControaller.getQuotes = (req: Request, res: Response) => {
   let page = parseInt(req.query.page as string) || 1;
@@ -290,5 +314,7 @@ QuoteListControaller.getQuotesByTag = (req: Request, res: Response) => {
       }
     });
 };
+
+
 
 export default QuoteListControaller;

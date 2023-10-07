@@ -1,12 +1,10 @@
 import { Request, Response } from "express";
+import { google } from "googleapis";
 var jwt = require("jsonwebtoken");
 import ProfileModel from "../models/ProfileModel";
 
 const ProfileControllar: any = {};
 
-ProfileControllar.testApi = (req: Request, res: Response) => {
-  res.status(200).json({ status: "success", data: "secessfully Deploy" });
-};
 ProfileControllar.CreateProfile = (req: Request, res: Response) => {
   let reqBody = req.body;
   ProfileModel.create(reqBody, (err: any, data: any) => {
@@ -56,6 +54,24 @@ ProfileControllar.SelectProfile = (req: Request, res: Response) => {
 };
 
 ProfileControllar.UpdateProfile = (req: Request, res: Response) => {
+  let username = req.headers["username"];
+  let reqBody = req.body;
+
+  ProfileModel.updateOne(
+    { username: username },
+    { $set: reqBody },
+    { upsert: true },
+    (err: any, data: any) => {
+      if (err) {
+        res.status(400).json({ status: "fail", data: err });
+      } else {
+        res.status(200).json({ status: "Success", data: data });
+      }
+    }
+  );
+};
+
+ProfileControllar.loginWithGmail = (req: Request, res: Response) => {
   let username = req.headers["username"];
   let reqBody = req.body;
 
