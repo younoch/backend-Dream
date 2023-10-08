@@ -49,6 +49,15 @@ router.post(
     ProfileController.UpdateProfile(req, res);
   }
 );
+router.get("/login-with-gmail",(req: Request, res: Response) => {
+    ProfileController.loginWithGmail(req, res);
+  }
+);
+
+router.get("/auth/google/callback",(req: Request, res: Response) => {
+    ProfileController.gmailCallBack(req, res);
+  }
+);
 
 //Quote controllar Implementation
 
